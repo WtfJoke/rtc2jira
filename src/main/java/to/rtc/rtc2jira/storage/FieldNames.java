@@ -33,6 +33,10 @@ public interface FieldNames {
   String CUSTOM_ATTRIBUTES = "customAttributes";
   String STATE = "state";
   String TAGS = "tags";
+  /**
+   * Used for storing time stamp when the workItem was exported
+   */
+  String EXPORT_TIMESTAMP = "exporttimestamp";
   String ITERATION_LABEL = "iterationLabel";
   String GITHUB_WORKITEM_LINK = "githubissuenumber";
   String JIRA_ID_LINK = "jiraid";

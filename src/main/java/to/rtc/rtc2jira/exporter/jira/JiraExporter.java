@@ -63,10 +63,10 @@ public class JiraExporter implements Exporter {
 
   @Override
   public void export() throws Exception {
-    Optional<Project> projectOptional = getProject();
-    if (projectOptional.isPresent()) {
+    Project project = restAccess.get("/project/" + settings.getJiraProjectKey(), Project.class);
+    if (project != null) {
       for (ODocument workItem : StorageQuery.getRTCWorkItems(store)) {
-        Issue issue = createIssueFromWorkItem(workItem, projectOptional.get());
+        Issue issue = createIssueFromWorkItem(workItem, project);
         Issue jiraIssue = createIssueInJira(issue);
         storeReference(Optional.ofNullable(jiraIssue), workItem);
       }
@@ -79,10 +79,6 @@ public class JiraExporter implements Exporter {
           of(FieldNames.JIRA_KEY_LINK, jiraIssue.getKey()), //
           of(FieldNames.JIRA_ID_LINK, jiraIssue.getId()));
     });
-  }
-
-  private Optional<Project> getProject() {
-    return Optional.ofNullable(restAccess.get("/project/" + settings.getJiraProjectKey(), Project.class));
   }
 
   private Issue createIssueInJira(Issue issue) throws Exception {

@@ -52,7 +52,7 @@ public class JiraExporter implements Exporter {
     if (settings.hasJiraProperties()) {
       restAccess = new JiraRestAccess(settings.getJiraUrl(), settings.getJiraUser(), settings.getJiraPassword());
       ClientResponse response = restAccess.get("/myself");
-      if (response.getStatus() == Status.OK.getStatusCode()) {
+      if (response.getStatus() == Status.OK.getStatusCode() && getProject() != null) {
         isConfigured = true;
       } else {
         System.err.println("Unable to connect to jira repository: " + response.toString());
@@ -61,16 +61,15 @@ public class JiraExporter implements Exporter {
     return isConfigured;
   }
 
+  private Project getProject() {
+    return restAccess.get("/project/" + settings.getJiraProjectKey(), Project.class);
+  }
+
   @Override
-  public void export() throws Exception {
-    Project project = restAccess.get("/project/" + settings.getJiraProjectKey(), Project.class);
-    if (project != null) {
-      for (ODocument workItem : StorageQuery.getRTCWorkItems(store)) {
-        Issue issue = createIssueFromWorkItem(workItem, project);
-        Issue jiraIssue = createIssueInJira(issue);
-        storeReference(Optional.ofNullable(jiraIssue), workItem);
-      }
-    }
+  public void exportItem(ODocument workItem) throws Exception {
+    Issue issue = createIssueFromWorkItem(workItem, getProject());
+    Issue jiraIssue = createIssueInJira(issue);
+    storeReference(Optional.ofNullable(jiraIssue), workItem);
   }
 
   private void storeReference(Optional<Issue> optionalJiraIssue, ODocument workItem) {

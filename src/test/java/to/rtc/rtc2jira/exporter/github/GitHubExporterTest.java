@@ -5,10 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import mockit.Expectations;
-import mockit.Mocked;
-import mockit.Verifications;
-
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
@@ -18,11 +14,14 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import com.orientechnologies.orient.core.record.impl.ODocument;
+
+import mockit.Expectations;
+import mockit.Mocked;
+import mockit.Verifications;
 import to.rtc.rtc2jira.Settings;
 import to.rtc.rtc2jira.TestDatabaseRule;
 import to.rtc.rtc2jira.storage.StorageEngine;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 public class GitHubExporterTest {
 
@@ -61,8 +60,7 @@ public class GitHubExporterTest {
   }
 
   @Test
-  public void testIsConfigured_WithValidCredentials_ExpectIsConfigured(@Mocked Repository repoMock)
-      throws IOException {
+  public void testIsConfigured_WithValidCredentials_ExpectIsConfigured(@Mocked Repository repoMock) throws IOException {
     new Expectations() {
       {
         settingsMock.hasGithubProperties();
@@ -75,26 +73,23 @@ public class GitHubExporterTest {
   }
 
   @Test
-  public void testExport_WithoutEmptyDB_ExpectNoExport(@Mocked IssueService issueServiceMock)
-      throws Exception {
-    exporter.export();
+  public void testExport_WithoutEmptyDB_ExpectNoExport(@Mocked IssueService issueServiceMock) throws Exception {
+    exporter.export(engine);
     new Verifications() {
       {
-        issueServiceMock.createIssue(withInstanceOf(IRepositoryIdProvider.class),
-            withInstanceOf(Issue.class));
+        issueServiceMock.createIssue(withInstanceOf(IRepositoryIdProvider.class), withInstanceOf(Issue.class));
         times = 0;
       }
     };
   }
 
   @Test
-  public void testExport_WithDBEntries_ExpectExport(@Mocked IssueService issueServiceMock)
-      throws Exception {
+  public void testExport_WithDBEntries_ExpectExport(@Mocked IssueService issueServiceMock) throws Exception {
     engine.withDB(db -> {
       createWorkItem(123);
       createWorkItem(324);
     });
-    exporter.export();
+    exporter.export(engine);
 
     new Verifications() {
       {

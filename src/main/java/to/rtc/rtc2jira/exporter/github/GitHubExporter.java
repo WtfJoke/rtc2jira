@@ -67,12 +67,11 @@ public class GitHubExporter implements Exporter {
     this.issueService = new IssueService(client);
   }
 
-  public void export() throws Exception {
-    for (ODocument workItem : StorageQuery.getRTCWorkItems(store.getStorage())) {
-      Issue issue = createIssueFromWorkItem(workItem);
-      Issue gitHubIssue = createGitHubIssue(issue);
-      store.storeLinkToIssueInWorkItem(Optional.ofNullable(gitHubIssue), workItem);
-    }
+  @Override
+  public void exportItem(ODocument workItem) throws Exception {
+    Issue issue = createIssueFromWorkItem(workItem);
+    Issue gitHubIssue = createGitHubIssue(issue);
+    store.storeLinkToIssueInWorkItem(Optional.ofNullable(gitHubIssue), workItem);
   }
 
   private Issue createIssueFromWorkItem(ODocument workItem) throws IOException {

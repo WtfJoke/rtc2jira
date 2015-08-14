@@ -29,7 +29,7 @@ public class Main {
     for (Exporter exporter : getExporters()) {
       exporter.initialize(settings, storageEngine);
       if (exporter.isConfigured()) {
-        exporter.export();
+        exporter.export(storageEngine);
       }
     }
   }
